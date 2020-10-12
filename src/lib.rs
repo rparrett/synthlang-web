@@ -1,18 +1,19 @@
 #![allow(clippy::wildcard_imports)]
 
-use seed::{prelude::*, *};
 use heck::TitleCase;
+use itertools::Itertools;
 use rand::prelude::*;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64;
+use seed::{prelude::*, *};
 use synthlang::SynthLang;
-use itertools::Itertools;
 
 #[macro_use]
 extern crate version;
 
 fn init(mut url: Url, _: &mut impl Orders<Msg>) -> Model {
-    let seed = url.next_hash_path_part()
+    let seed = url
+        .next_hash_path_part()
         .and_then(|seed_str| u64::from_str_radix(seed_str, 16).ok())
         .unwrap_or_else(|| {
             let mut seed_rng = thread_rng();
@@ -21,9 +22,7 @@ fn init(mut url: Url, _: &mut impl Orders<Msg>) -> Model {
 
     let lang_data = generate_lang(seed);
 
-    Model {
-        lang_data
-    }
+    Model { lang_data }
 }
 
 fn generate_lang(seed: u64) -> LangData {
@@ -51,7 +50,7 @@ fn generate_lang(seed: u64) -> LangData {
         "shopkeeper",
         "tunic",
         "daughter",
-        "queen"
+        "queen",
     ];
 
     let mut samples = vec![];
@@ -65,7 +64,7 @@ fn generate_lang(seed: u64) -> LangData {
     for consonant in &lang.consonants {
         consonants.push(consonant.to_string());
     }
-    
+
     let mut vowels = vec![];
 
     for vowel in &lang.vowels {
@@ -87,7 +86,7 @@ fn generate_lang(seed: u64) -> LangData {
         ("old", lang.word()),
         ("serene", lang.word()),
         ("frigid", lang.word()),
-        ("scorching", lang.word())
+        ("scorching", lang.word()),
     ];
     let mut nouns = vec![
         ("river", lang.word()),
@@ -111,11 +110,17 @@ fn generate_lang(seed: u64) -> LangData {
 
         let compound = lang.compound(&adjective.1, &noun.1).to_string();
 
-        places.push((compound, adjective.1.to_string(), noun.1.to_string(), adjective.0.to_string(), noun.0.to_string()));
+        places.push((
+            compound,
+            adjective.1.to_string(),
+            noun.1.to_string(),
+            adjective.0.to_string(),
+            noun.0.to_string(),
+        ));
     }
 
     places.dedup();
-    
+
     LangData {
         name: lang.word().to_string().to_title_case(),
         samples,
@@ -123,7 +128,7 @@ fn generate_lang(seed: u64) -> LangData {
         vowels,
         places,
         seed,
-        lang
+        lang,
     }
 }
 
@@ -138,14 +143,14 @@ struct LangData {
     vowels: Vec<String>,
     places: Vec<(String, String, String, String, String)>,
     seed: u64,
-    lang: SynthLang
+    lang: SynthLang,
 }
 
 // update
 
 #[derive(Copy, Clone)]
 enum Msg {
-    Generate
+    Generate,
 }
 
 fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
@@ -170,11 +175,7 @@ fn view(model: &Model) -> Vec<Node<Msg>> {
                     C!["navbar"],
                     section![
                         C!["navbar-section"],
-                        a![
-                            C!["navbar-brand mr-2"],
-                            "SynthLang ",
-                            version!()
-                        ]
+                        a![C!["navbar-brand mr-2"], "SynthLang ", version!()]
                     ],
                     section![
                         C!["navbar-section"],
@@ -191,23 +192,16 @@ fn view(model: &Model) -> Vec<Node<Msg>> {
             C!["container grid-lg"],
             div![
                 C!["banner text-center"],
-                div![
-                    C!["text-gray"],
-                    "You have created"
-                ],
+                div![C!["text-gray"], "You have created"],
                 h1![
                     "The distinguished language of ",
-                    span![
-                        model.lang_data.name.as_str(),
-                        C!["text-primary"]
-                    ],
+                    span![model.lang_data.name.as_str(), C!["text-primary"]],
                 ],
-                div![
-                    button![
-                        C!["btn btn-primary"],
-                        "Generate another!", ev(Ev::Click, |_| Msg::Generate),
-                    ],
-                ]
+                div![button![
+                    C!["btn btn-primary"],
+                    "Generate another!",
+                    ev(Ev::Click, |_| Msg::Generate),
+                ],]
             ],
             div![
                 C!["columns"],
@@ -222,7 +216,7 @@ fn view(model: &Model) -> Vec<Node<Msg>> {
                     other_view(&model)
                 ]
             ],
-        ]
+        ],
     ]
 }
 
@@ -234,40 +228,36 @@ fn samples_view(model: &Model) -> Node<Msg> {
             div![
                 C!["card-title h5"],
                 "Sample vocabulary in ",
-                span![
-                    C!["text-primary"],
-                    model.lang_data.name.as_str(),
-                ]
+                span![C!["text-primary"], model.lang_data.name.as_str(),]
             ],
             div![
                 C!["card-subtitle text-gray"],
-                format!("These are some sample {} vocabulary words, with their English translations.", model.lang_data.name),
+                format!(
+                    "These are some sample {} vocabulary words, with their English translations.",
+                    model.lang_data.name
+                ),
             ]
         ],
         div![
             C!["card-body columns"],
-            model.lang_data.samples.iter().chunks(model.lang_data.samples.len()/2).into_iter().map(|chunk| {
-                div![
-                    C!["column col-6"],
-                    table![
-                        C!["table"],
-                        tr![
-                            th!["Word"],
-                            th!["Meaning"]
-                        ],
-                        chunk.into_iter().map(|sample| {
-                            tr![
-                                td![
-                                    sample.0.as_str()
-                                ],
-                                td![
-                                    sample.1.as_str()
-                                ]
-                            ]
-                        })
+            model
+                .lang_data
+                .samples
+                .iter()
+                .chunks(model.lang_data.samples.len() / 2)
+                .into_iter()
+                .map(|chunk| {
+                    div![
+                        C!["column col-6"],
+                        table![
+                            C!["table"],
+                            tr![th!["Word"], th!["Meaning"]],
+                            chunk.into_iter().map(|sample| {
+                                tr![td![sample.0.as_str()], td![sample.1.as_str()]]
+                            })
+                        ]
                     ]
-                ]
-            })
+                })
         ]
     ]
 }
@@ -280,14 +270,14 @@ fn parts_view(model: &Model) -> Node<Msg> {
             div![
                 C!["card-title h5"],
                 "Syllable parts in ",
-                span![
-                    C!["text-primary"],
-                    model.lang_data.name.as_str(),
-                ],
+                span![C!["text-primary"], model.lang_data.name.as_str(),],
             ],
             div![
                 C!["card-subtitle text-gray"],
-                format!("These the building blocks of words in {}.", model.lang_data.name),
+                format!(
+                    "These the building blocks of words in {}.",
+                    model.lang_data.name
+                ),
             ]
         ],
         div![
@@ -296,36 +286,24 @@ fn parts_view(model: &Model) -> Node<Msg> {
                 C!["column col-6"],
                 table![
                     C!["table"],
-                    tr![
-                        th![
-                            "Consonants",
-                        ],
-                    ],
-                    model.lang_data.consonants.iter().map(|consonant| {
-                        tr![
-                            td![
-                                consonant.as_str()
-                            ]
-                        ]
-                    })
+                    tr![th!["Consonants",],],
+                    model
+                        .lang_data
+                        .consonants
+                        .iter()
+                        .map(|consonant| { tr![td![consonant.as_str()]] })
                 ],
             ],
             div![
                 C!["column col-6"],
                 table![
                     C!["table"],
-                    tr![
-                        th![
-                            "Vowels",
-                        ],
-                    ],
-                    model.lang_data.vowels.iter().map(|consonant| {
-                        tr![
-                            td![
-                                consonant.as_str()
-                            ]
-                        ]
-                    })
+                    tr![th!["Vowels",],],
+                    model
+                        .lang_data
+                        .vowels
+                        .iter()
+                        .map(|consonant| { tr![td![consonant.as_str()]] })
                 ]
             ],
         ]
@@ -340,30 +318,33 @@ fn places_view(model: &Model) -> Node<Msg> {
             div![
                 C!["card-title h5"],
                 "Famous places in ",
-                span![
-                    C!["text-primary"],
-                    model.lang_data.name.as_str(),
-                ],
+                span![C!["text-primary"], model.lang_data.name.as_str(),],
             ],
             div![
                 C!["card-subtitle text-gray"],
-                format!("These are some fictional places, and what people speaking {} might call them.", model.lang_data.name),
+                format!(
+                    "These are some fictional places, and what people speaking {} might call them.",
+                    model.lang_data.name
+                ),
             ]
         ],
         div![
             C!["card-body"],
             table![
                 C!["table"],
-                tr![
-                    th!["Name"],
-                    th!["Meaning"],
-                    th![""]
-                ],
+                tr![th!["Name"], th!["Meaning"], th![""]],
                 model.lang_data.places.iter().map(|place| {
                     tr![
                         td![place.0.to_title_case()],
-                        td![format!("\"{} {}\"", place.3.to_title_case(), place.4.to_title_case())],
-                        td![format!("from {} (\"{}\") and {} (\"{}\")", place.1, place.3, place.2, place.4)],
+                        td![format!(
+                            "\"{} {}\"",
+                            place.3.to_title_case(),
+                            place.4.to_title_case()
+                        )],
+                        td![format!(
+                            "from {} (\"{}\") and {} (\"{}\")",
+                            place.1, place.3, place.2, place.4
+                        )],
                     ]
                 })
             ]
@@ -379,45 +360,31 @@ fn other_view(model: &Model) -> Node<Msg> {
             div![
                 C!["card-title h5"],
                 "Other parameters for ",
-                span![
-                    C!["text-primary"],
-                    model.lang_data.name.as_str(),
-                ],
+                span![C!["text-primary"], model.lang_data.name.as_str(),],
             ],
             div![
                 C!["card-subtitle text-gray"],
-                format!("These values affect the overall shape of words in {} ", model.lang_data.name),
+                format!(
+                    "These values affect the overall shape of words in {} ",
+                    model.lang_data.name
+                ),
             ]
         ],
         div![
             C!["card-body"],
             table![
                 C!["table"],
-                tr![
-                    th!["Name"],
-                    th!["Value"],
-                ],
+                tr![th!["Name"], th!["Value"],],
                 tr![
                     td!["Seed"],
-                    td![
-                        a![
-                            attrs! {At::Href => format!("#/{:x}", model.lang_data.seed)},
-                            format!("{:x}", model.lang_data.seed),
-                        ]
-                    ]
+                    td![a![
+                        attrs! {At::Href => format!("#/{:x}", model.lang_data.seed)},
+                        format!("{:x}", model.lang_data.seed),
+                    ]]
                 ],
-                tr![
-                    td!["VC Weight"],
-                    td![model.lang_data.lang.vc_weight],
-                ],
-                tr![
-                    td!["CV Weight"],
-                    td![model.lang_data.lang.cv_weight],
-                ],
-                tr![
-                    td!["CVC Weight"],
-                    td![model.lang_data.lang.cvc_weight],
-                ]
+                tr![td!["VC Weight"], td![model.lang_data.lang.vc_weight],],
+                tr![td!["CV Weight"], td![model.lang_data.lang.cv_weight],],
+                tr![td!["CVC Weight"], td![model.lang_data.lang.cvc_weight],]
             ]
         ]
     ]
