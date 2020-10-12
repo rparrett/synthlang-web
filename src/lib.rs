@@ -207,13 +207,13 @@ fn view(model: &Model) -> Vec<Node<Msg>> {
                 C!["columns"],
                 div![
                     C!["column col-8 col-md-12"],
-                    samples_view(&model),
-                    places_view(&model)
+                    samples_view(model),
+                    places_view(model)
                 ],
                 div![
                     C!["column col-4 col-md-12"],
-                    parts_view(&model),
-                    other_view(&model)
+                    parts_view(model),
+                    other_view(model)
                 ]
             ],
         ],
