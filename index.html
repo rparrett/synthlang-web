@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
+    <style>
+        body {
+            padding-top: 0;
+        }
+        .nav-container {
+            box-shadow: 0 0.25rem 1rem rgba(48,55,66,.15);
+        }
+        .nav-container .container {
+            padding: 10px;
+        }
+        .banner {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .banner h1 {
+            margin-bottom: 10px;
+        }
+        .card {
+            border: 0;
+            box-shadow: 0 0.25rem 1rem rgba(48,55,66,.15);
+            margin-bottom: 15px;
+        }
+        .table td {
+            border-bottom: 0;
+            padding: .1rem .4rem;
+        }
+        .table th {
+            padding: .2rem .4rem;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="app"></section>
+    <script type="module">
+        import init from '/pkg/package.js';
+        init('/pkg/package_bg.wasm');
+    </script>
+</body>
+
+</html>
