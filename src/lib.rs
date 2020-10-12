@@ -71,7 +71,7 @@ fn generate_lang(seed: u64) -> LangData {
         vowels.push(vowel.to_string());
     }
 
-    let mut adjectives = vec![
+    let adjectives = vec![
         ("red", lang.word()),
         ("orange", lang.word()),
         ("yellow", lang.word()),
@@ -88,7 +88,7 @@ fn generate_lang(seed: u64) -> LangData {
         ("frigid", lang.word()),
         ("scorching", lang.word()),
     ];
-    let mut nouns = vec![
+    let nouns = vec![
         ("river", lang.word()),
         ("island", lang.word()),
         ("harbor", lang.word()),
