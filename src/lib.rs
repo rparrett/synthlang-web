@@ -180,7 +180,7 @@ fn view(model: &Model) -> Vec<Node<Msg>> {
                         C!["navbar-section"],
                         a![
                             C!["btn btn-primary"],
-                            attrs! {At::Href => "https://github.com/rparrett/synthlang-web")},
+                            attrs! {At::Href => "https://github.com/rparrett/synthlang-web"},
                             "Source"
                         ]
                     ]
