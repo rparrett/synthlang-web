@@ -253,7 +253,7 @@ fn samples_view(model: &Model) -> Node<Msg> {
                             C!["table"],
                             tr![th!["Word"], th!["Meaning"]],
                             chunk.into_iter().map(|sample| {
-                                tr![td![sample.0.as_str()], td![sample.1.as_str()]]
+                                tr![td![sample.0.as_str()], td![C!["text-gray"],sample.1.as_str()]]
                             })
                         ]
                     ]
@@ -336,12 +336,12 @@ fn places_view(model: &Model) -> Node<Msg> {
                 model.lang_data.places.iter().map(|place| {
                     tr![
                         td![place.0.to_title_case()],
-                        td![format!(
+                        td![C!["text-gray"], format!(
                             "\"{} {}\"",
                             place.3.to_title_case(),
                             place.4.to_title_case()
                         )],
-                        td![format!(
+                        td![C!["text-gray"], format!(
                             "from {} (\"{}\") and {} (\"{}\")",
                             place.1, place.3, place.2, place.4
                         )],
