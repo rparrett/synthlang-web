@@ -15,3 +15,13 @@ SynthLang doesn't do a lot of the fancy things that Language Generator does (yet
 ## Demo
 
 There may be a demo running [here](https://synthlang.robparrett.com).
+
+## Build
+
+```
+git clone https://github.com/rparrett/synthlang
+git clone https://github.com/rparrett/synthlang-web
+cd synthlang-web
+cargo make build
+cargo make serve
+```
