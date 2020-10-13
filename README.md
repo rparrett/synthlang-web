@@ -24,6 +24,9 @@ There may be a demo running [here](https://synthlang.robparrett.com).
 - Syllable parts should be associated with sounds and there should be tooltips explaining how to pronounce a word
 - It should be possible for a word to begin with e.g. `Ng`, but every language with `Ng` doesn't need to have this feature
   Maybe a "language" should also include probabilities of certain syllable part pairings, (including the null syllable part)
+- Words should be particular parts of speach and we should be able to conjugate them
+- Generate some prepositions and Lordly titles and such
+- Languages should occasionally be strewn with apostrophes and perhaps hyphens
 
 ## Build
 
