@@ -37,3 +37,11 @@ cd synthlang-web
 cargo make build
 cargo make serve
 ```
+
+## See also
+
+An excellent blog post about generating words. I wish I would have read this before starting on this project.
+http://mewo2.com/notes/naming-language/
+
+The inspiration for this project
+http://lang-gen.appspot.com/
