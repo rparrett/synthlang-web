@@ -119,7 +119,9 @@ fn generate_lang(seed: u64) -> LangData {
         ));
     }
 
+    places.sort();
     places.dedup();
+    places.shuffle(&mut our_rng);
 
     LangData {
         name: lang.word().to_string().to_title_case(),
