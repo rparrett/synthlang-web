@@ -12,6 +12,13 @@ SynthLang doesn't do a lot of the fancy things that Language Generator does (yet
 
 [SynthLang library](https://github.com/rparrett/synthlang)
 
+
+[Generating Naming Languages](http://mewo2.com/notes/naming-language/)
+An excellent blog post about generating words. I wish I would have read this before starting on this project.
+
+[Language Generator](http://lang-gen.appspot.com/)
+The inspiration for this project
+
 ## Demo
 
 There may be a demo running [here](https://synthlang.robparrett.com).
@@ -37,11 +44,3 @@ cd synthlang-web
 cargo make build
 cargo make serve
 ```
-
-## See also
-
-An excellent blog post about generating words. I wish I would have read this before starting on this project.
-http://mewo2.com/notes/naming-language/
-
-The inspiration for this project
-http://lang-gen.appspot.com/
