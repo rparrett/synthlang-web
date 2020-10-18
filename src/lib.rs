@@ -11,16 +11,26 @@ use synthlang::SynthLang;
 #[macro_use]
 extern crate version;
 
-fn init(mut url: Url, _: &mut impl Orders<Msg>) -> Model {
-    let seed = url
-        .next_hash_path_part()
-        .and_then(|seed_str| u64::from_str_radix(seed_str, 16).ok())
-        .unwrap_or_else(|| {
-            let mut seed_rng = thread_rng();
-            seed_rng.gen()
-        });
+fn init(mut url: Url, orders: &mut impl Orders<Msg>) -> Model {
+    orders.subscribe(Msg::UrlChanged);
 
-    let lang_data = generate_lang(seed);
+    let mut seed: Option<u64> = match url.next_path_part() {
+        Some("seed") => {
+            let _version = url.next_path_part(); // TODO
+            let seed = url.next_path_part()
+                .and_then(|seed_str| u64::from_str_radix(seed_str, 16).ok());
+            seed
+        },
+        _ => None
+    };
+
+    if seed.is_none() {
+        let mut seed_rng = thread_rng();
+
+        seed = Some(seed_rng.gen());
+    }
+
+    let lang_data = generate_lang(seed.unwrap());
 
     Model { lang_data }
 }
@@ -150,17 +160,26 @@ struct LangData {
 
 // update
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 enum Msg {
-    Generate,
+    UrlChanged(subs::UrlChanged),
 }
 
 fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
     match msg {
-        Msg::Generate => {
-            let mut seed_rng = thread_rng();
+        Msg::UrlChanged(subs::UrlChanged(url)) => {
+            // Right now the only possible urls are
+            // /seed/{version}/{seed} and
+            // /
+            //
+            // When navigating to the permalink, we don't
+            // want to generate a new language.
 
-            (*model).lang_data = generate_lang(seed_rng.gen());
+            if url.path().len() == 0 {
+                let mut seed_rng = thread_rng();
+
+                (*model).lang_data = generate_lang(seed_rng.gen());
+            }
         }
     }
 }
@@ -199,10 +218,10 @@ fn view(model: &Model) -> Vec<Node<Msg>> {
                     "The distinguished language of ",
                     span![model.lang_data.name.as_str(), C!["text-primary"]],
                 ],
-                div![button![
+                div![a![
                     C!["btn btn-primary"],
+                    attrs! {At::Href => "/"},
                     "Generate another!",
-                    ev(Ev::Click, |_| Msg::Generate),
                 ],]
             ],
             div![
@@ -389,7 +408,7 @@ fn other_view(model: &Model) -> Node<Msg> {
                 tr![
                     td!["Seed"],
                     td![a![
-                        attrs! {At::Href => format!("#/{:x}", model.lang_data.seed)},
+                        attrs! {At::Href => format!("/seed/{}/{:x}", version!(), model.lang_data.seed)},
                         format!("{:x}", model.lang_data.seed),
                     ]]
                 ],
