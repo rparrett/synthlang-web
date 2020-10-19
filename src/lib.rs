@@ -13,24 +13,10 @@ extern crate version;
 
 fn init(mut url: Url, orders: &mut impl Orders<Msg>) -> Model {
     orders.subscribe(Msg::UrlChanged);
+    orders.subscribe(Msg::UrlRequested);
 
-    let mut seed: Option<u64> = match url.next_path_part() {
-        Some("seed") => {
-            let _version = url.next_path_part(); // TODO
-            let seed = url.next_path_part()
-                .and_then(|seed_str| u64::from_str_radix(seed_str, 16).ok());
-            seed
-        },
-        _ => None
-    };
-
-    if seed.is_none() {
-        let mut seed_rng = thread_rng();
-
-        seed = Some(seed_rng.gen());
-    }
-
-    let lang_data = generate_lang(seed.unwrap());
+    let seed = url_to_seed(&mut url);
+    let lang_data = generate_lang(seed);
 
     Model { lang_data }
 }
@@ -163,22 +149,76 @@ struct LangData {
 #[derive(Clone)]
 enum Msg {
     UrlChanged(subs::UrlChanged),
+    UrlRequested(subs::UrlRequested),
+}
+
+fn url_to_seed(url: &mut Url) -> u64 {
+    let seed: Option<u64> = match url.next_path_part() {
+        Some("seed") => {
+            let _version = url.next_path_part(); // TODO
+            let seed = url
+                .next_path_part()
+                .and_then(|seed_str| u64::from_str_radix(seed_str, 16).ok());
+            seed
+        }
+        _ => None,
+    };
+
+    match seed {
+        Some(seed) => seed,
+        None => {
+            let mut seed_rng = thread_rng();
+            seed_rng.gen()
+        }
+    }
 }
 
 fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
     match msg {
-        Msg::UrlChanged(subs::UrlChanged(url)) => {
+        Msg::UrlChanged(subs::UrlChanged(mut url)) => {
+            let seed = url_to_seed(&mut url);
+            (*model).lang_data = generate_lang(seed);
+        }
+        Msg::UrlRequested(subs::UrlRequested(mut url, url_request)) => {
             // Right now the only possible urls are
+            //
             // /seed/{version}/{seed} and
             // /
             //
-            // When navigating to the permalink, we don't
-            // want to generate a new language.
+            // The goal here is to only add to the browser history and
+            // scroll to the top of the page when we navigate to a new
+            // permalink.
 
-            if url.path().len() == 0 {
-                let mut seed_rng = thread_rng();
+            let permalink = Url::current().path().len() != 0;
+            let to_permalink = url.path().len() != 0;
 
-                (*model).lang_data = generate_lang(seed_rng.gen());
+            match (permalink, to_permalink) {
+                (false, true) => {
+                    // We are showing a random language and navigating
+                    // to its permalink
+
+                    url_request.handled();
+                    url.go_and_replace();
+                }
+                (false, false) => {
+                    // We are generating a new random language
+
+                    url_request.handled_and_prevent_refresh();
+                    url.go_and_replace();
+                    let seed = url_to_seed(&mut url);
+                    (*model).lang_data = generate_lang(seed);
+                }
+                (true, true) => {
+                    // We are clicking the permalink link again for the
+                    // same language.
+
+                    url_request.handled_and_prevent_refresh();
+                    url.go_and_replace();
+                }
+                (true, false) => {
+                    // We are showing a permalink and generating a new
+                    // random language.
+                }
             }
         }
     }
