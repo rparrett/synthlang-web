@@ -1,5 +1,5 @@
 [package]
-version = "0.2.1"
+version = "0.2.2"
 name = "synthlang-web"
 repository = "https://github.com/rparrett/synthlang-web"
 authors = ["Rob Parrett <rob.parrett@gmail.com>"]
