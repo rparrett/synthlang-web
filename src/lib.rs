@@ -197,8 +197,8 @@ fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
             // scroll to the top of the page when we navigate to a new
             // permalink.
 
-            let permalink = Url::current().path().len() != 0;
-            let to_permalink = url.path().len() != 0;
+            let permalink = !Url::current().path().is_empty();
+            let to_permalink = !url.path().is_empty();
 
             match (permalink, to_permalink) {
                 (false, true) => {
