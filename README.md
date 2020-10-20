@@ -26,7 +26,6 @@ There may be a demo running [here](https://synthlang.robparrett.com).
 ## TODO
 
 - Select english sample vocabulary randomly from a larger pool of words
-- Some sort of UI for generating more text with the current language
 - Some sort of UI for tweaking language parameters
 - Improved (optional? parametric?) filtering of output for pronounceability
 - Syllable parts should be associated with sounds and there should be tooltips explaining how to pronounce a word

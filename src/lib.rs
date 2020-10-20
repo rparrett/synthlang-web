@@ -18,7 +18,10 @@ fn init(mut url: Url, orders: &mut impl Orders<Msg>) -> Model {
     let seed = url_to_seed(&mut url);
     let lang_data = generate_lang(seed);
 
-    Model { lang_data }
+    Model {
+        lang_data,
+        more_words_modal: false,
+    }
 }
 
 fn generate_lang(seed: u64) -> LangData {
@@ -125,6 +128,7 @@ fn generate_lang(seed: u64) -> LangData {
         consonants,
         vowels,
         places,
+        more_words: vec![],
         seed,
         lang,
     }
@@ -132,6 +136,7 @@ fn generate_lang(seed: u64) -> LangData {
 
 struct Model {
     lang_data: LangData,
+    more_words_modal: bool,
 }
 
 struct LangData {
@@ -140,6 +145,7 @@ struct LangData {
     consonants: Vec<String>,
     vowels: Vec<String>,
     places: Vec<(String, String, String, String, String)>,
+    more_words: Vec<String>,
     seed: u64,
     lang: SynthLang,
 }
@@ -150,6 +156,8 @@ struct LangData {
 enum Msg {
     UrlChanged(subs::UrlChanged),
     UrlRequested(subs::UrlRequested),
+    CloseMoreWordsModal,
+    OpenMoreWordsModal,
 }
 
 fn url_to_seed(url: &mut Url) -> u64 {
@@ -221,6 +229,17 @@ fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
                 }
             }
         }
+        Msg::OpenMoreWordsModal => {
+            let more_words = (0..40)
+                .map(|_| model.lang_data.lang.word().to_string())
+                .collect();
+            model.lang_data.more_words = more_words;
+
+            model.more_words_modal = true;
+        }
+        Msg::CloseMoreWordsModal => {
+            model.more_words_modal = false;
+        }
     }
 }
 
@@ -278,6 +297,7 @@ fn view(model: &Model) -> Vec<Node<Msg>> {
                 ]
             ],
         ],
+        more_words_modal_view(model),
     ]
 }
 
@@ -300,28 +320,36 @@ fn samples_view(model: &Model) -> Node<Msg> {
             ]
         ],
         div![
-            C!["card-body columns"],
-            model
-                .lang_data
-                .samples
-                .iter()
-                .chunks(model.lang_data.samples.len() / 2)
-                .into_iter()
-                .map(|chunk| {
-                    div![
-                        C!["column col-6"],
-                        table![
-                            C!["table"],
-                            tr![th!["Word"], th!["Meaning"]],
-                            chunk.into_iter().map(|sample| {
-                                tr![
-                                    td![sample.0.as_str()],
-                                    td![C!["text-gray"], sample.1.as_str()]
-                                ]
-                            })
+            C!["card-body"],
+            div![
+                C!["columns"],
+                model
+                    .lang_data
+                    .samples
+                    .iter()
+                    .chunks(model.lang_data.samples.len() / 2)
+                    .into_iter()
+                    .map(|chunk| {
+                        div![
+                            C!["column col-6"],
+                            table![
+                                C!["table"],
+                                tr![th!["Word"], th!["Meaning"]],
+                                chunk.into_iter().map(|sample| {
+                                    tr![
+                                        td![sample.0.as_str()],
+                                        td![C!["text-gray"], sample.1.as_str()]
+                                    ]
+                                })
+                            ]
                         ]
-                    ]
-                })
+                    })
+            ],
+            div![button![
+                C!["btn btn-link"],
+                ev(Ev::Click, |_| Msg::OpenMoreWordsModal),
+                "More Words"
+            ]]
         ]
     ]
 }
@@ -456,6 +484,57 @@ fn other_view(model: &Model) -> Node<Msg> {
                 tr![td!["CV Weight"], td![model.lang_data.lang.cv_weight],],
                 tr![td!["CVC Weight"], td![model.lang_data.lang.cvc_weight],]
             ]
+        ]
+    ]
+}
+
+fn more_words_modal_view(model: &Model) -> Node<Msg> {
+    let c = if model.more_words_modal {
+        "modal active"
+    } else {
+        "modal"
+    };
+
+    // chunks doesn't work when len = 0?
+    let content: Vec<Node<Msg>> = if model.lang_data.more_words.is_empty() {
+        model
+            .lang_data
+            .more_words
+            .iter()
+            .chunks(model.lang_data.more_words.len() / 4)
+            .into_iter()
+            .map(|chunk| {
+                div![
+                    C!["column col-3"],
+                    chunk.into_iter().map(|word| { div![word.as_str()] })
+                ]
+            })
+            .collect()
+    } else {
+        vec![]
+    };
+
+    div![
+        C![c],
+        div![
+            C!["modal-overlay"],
+            ev(Ev::Click, |_| Msg::CloseMoreWordsModal)
+        ],
+        div![
+            C!["modal-container"],
+            div![
+                C!["modal-header"],
+                div![
+                    C!["btn btn-clear float-right"],
+                    ev(Ev::Click, |_| Msg::CloseMoreWordsModal)
+                ],
+                div![
+                    C!["modal-title h5"],
+                    "More Words in ",
+                    span![C!["text-primary"], model.lang_data.name.as_str(),],
+                ]
+            ],
+            div![C!["modal-body"], div![C!["content columns"], content]]
         ]
     ]
 }
