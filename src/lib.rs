@@ -496,7 +496,7 @@ fn more_words_modal_view(model: &Model) -> Node<Msg> {
     };
 
     // chunks doesn't work when len = 0?
-    let content: Vec<Node<Msg>> = if model.lang_data.more_words.is_empty() {
+    let content: Vec<Node<Msg>> = if !model.lang_data.more_words.is_empty() {
         model
             .lang_data
             .more_words
