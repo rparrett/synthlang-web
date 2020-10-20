@@ -30,7 +30,7 @@ There may be a demo running [here](https://synthlang.robparrett.com).
 - Improved (optional? parametric?) filtering of output for pronounceability
 - Syllable parts should be associated with sounds and there should be tooltips explaining how to pronounce a word
 - When combining syllables to make words, should we obey syllable part weights? Probably.
-- Words should be particular parts of speach and we should be able to conjugate them
+- Words should be particular parts of speech and we should be able to conjugate them
 - Generate some prepositions and Lordly titles and such
 - Languages should occasionally be strewn with apostrophes and perhaps hyphens
 
